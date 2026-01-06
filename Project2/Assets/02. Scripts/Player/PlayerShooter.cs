@@ -188,8 +188,11 @@ public class PlayerShooter : MonoBehaviour
         }
 
         GameObject go = bulletManager.GetBulletPrefab();
-        if(go == null)
-            return ;
+        if (go == null)
+        {
+            Debug.Log("No Pool");
+            return;
+        }
 
         go.transform.position = gunMuzzle.position;
         go.transform.rotation = Quaternion.LookRotation(dir);
