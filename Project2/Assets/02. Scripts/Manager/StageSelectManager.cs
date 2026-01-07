@@ -9,6 +9,7 @@ public class StageSelectManager : MonoBehaviour
     {
         SceneManager.LoadScene("Tutorial");
     }
+
     public void LoadStage1()
     {
         SceneManager.LoadScene("Stage1");
@@ -22,6 +23,11 @@ public class StageSelectManager : MonoBehaviour
     public void LoadInfiniteStage1()
     {
         SceneManager.LoadScene("InfiniteStage1");
+    }
+
+    public void LoadInfiniteStage2()
+    {
+        SceneManager.LoadScene("InfiniteStage2");
     }
 
     public void LoadMain()
