@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 public class PlayerControl : MonoBehaviour
 {
@@ -29,16 +28,11 @@ public class PlayerControl : MonoBehaviour
     //Update is called once per frame
     void Update()
     {
-        Vector2 move = Keyboard.current != null
-    ? new Vector2(
-        (Keyboard.current.dKey.isPressed ? 1 : 0) - (Keyboard.current.aKey.isPressed ? 1 : 0),
-        (Keyboard.current.wKey.isPressed ? 1 : 0) - (Keyboard.current.sKey.isPressed ? 1 : 0)
-      )
-    : Vector2.zero;
-        horizontal = move.x;
-        vertical = move.y;
-        if (Keyboard.current != null && Keyboard.current.spaceKey.wasPressedThisFrame && isGrounded)
+        horizontal = Input.GetAxis("Horizontal");
+        vertical = Input.GetAxis("Vertical");
+        if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
         {
+            Debug.Log($"[Update] Space pressed | isGrounded = {isGrounded}");
             jumpRequested = true;
         }
     }
@@ -55,7 +49,7 @@ public class PlayerControl : MonoBehaviour
     }
     void PlayerMove()
     {
-        Vector3 currentVel=rb.velocity;
+        Vector3 currentVel = rb.velocity;
         Vector3 newVel = new Vector3(horizontal * movespeed, currentVel.y, vertical * movespeed);
         rb.velocity = Vector3.Lerp(rb.velocity, newVel, Time.deltaTime * 10.0f);
     }

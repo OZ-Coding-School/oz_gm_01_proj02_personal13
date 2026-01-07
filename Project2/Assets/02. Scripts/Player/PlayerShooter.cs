@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 public class PlayerShooter : MonoBehaviour
@@ -71,7 +70,6 @@ public class PlayerShooter : MonoBehaviour
 
     void Update()
     {
-        Debug.Log("PlayerShooter Update Running");
         if (InputLockManager.Blocked)
             return;
 
@@ -86,9 +84,8 @@ public class PlayerShooter : MonoBehaviour
     // 마우스 회전
     void HandleLook()
     {
-        Vector2 look = Mouse.current.delta.ReadValue();
-        float mx = look.x * mouseSensitivity * Time.deltaTime;
-        float my = look.y * mouseSensitivity * Time.deltaTime;
+        float mx = Input.GetAxis("Mouse X") * mouseSensitivity;
+        float my = Input.GetAxis("Mouse Y") * mouseSensitivity;
 
         if (yawRoot) yawRoot.Rotate(Vector3.up, mx, Space.World);
         pitch = Mathf.Clamp(pitch - my, -85f, 85f);
@@ -98,12 +95,10 @@ public class PlayerShooter : MonoBehaviour
     // 발사 처리 (연사/단발)
     void HandleFire()
     {
-        if (Mouse.current == null)
-            return;
-
         if (isAutoFire)
         {
-            if (Mouse.current.leftButton.isPressed && Time.time >= nextFireTime)
+            // 연사 모드: 좌클릭 유지
+            if (Input.GetMouseButton(0) && Time.time >= nextFireTime)
             {
                 nextFireTime = Time.time + fireRate;
                 Shoot();
@@ -111,7 +106,8 @@ public class PlayerShooter : MonoBehaviour
         }
         else
         {
-            if (Mouse.current.leftButton.wasPressedThisFrame)
+            // 단발 모드: 좌클릭 눌렀을 때만
+            if (Input.GetMouseButtonDown(0))
             {
                 Shoot();
             }
@@ -121,14 +117,14 @@ public class PlayerShooter : MonoBehaviour
     // 재장전
     void HandleReload()
     {
-        if (Keyboard.current != null && Keyboard.current.rKey.wasPressedThisFrame)
+        if (Input.GetKeyDown(KeyCode.R))
             Reload();
     }
 
     // 연사/단발 전환 (B키)
     void HandleFireModeSwitch()
     {
-        if (Keyboard.current != null && Keyboard.current.bKey.wasPressedThisFrame)
+        if (Input.GetKeyDown(KeyCode.B))
         {
             isAutoFire = !isAutoFire;
             string mode = isAutoFire ? "연사" : "단발";
@@ -138,20 +134,23 @@ public class PlayerShooter : MonoBehaviour
 
     void HandleZoom()
     {
-        if (cam == null || Mouse.current == null)
-            return;
+        if (cam == null) return;
 
-        if (Mouse.current.rightButton.wasPressedThisFrame)
+        if (Input.GetMouseButtonDown(1))
         {
             isZooming = true;
             mouseSensitivity = originalSensitivity * zoomSensitivityMultiplier;
+
+            // 줌 시 스코프 오버레이만 표시
             if (scopeOverlay != null) scopeOverlay.enabled = true;
         }
 
-        if (Mouse.current.rightButton.wasReleasedThisFrame)
+        if (Input.GetMouseButtonUp(1))
         {
             isZooming = false;
             mouseSensitivity = originalSensitivity;
+
+            // 줌 해제 시 오버레이 비활성화
             if (scopeOverlay != null) scopeOverlay.enabled = false;
         }
 
@@ -168,7 +167,6 @@ public class PlayerShooter : MonoBehaviour
         gunRoot.localPosition = Vector3.Lerp(gunRoot.localPosition, targetPos, Time.deltaTime * alignSpeed);
     }
 
-
     void Shoot()
     {
         if (cam == null || gunMuzzle == null)
@@ -182,17 +180,14 @@ public class PlayerShooter : MonoBehaviour
 
         Vector3 dir = cam.transform.forward;
         if (bulletManager == null)
-        { 
-            Debug.Log("BulletManager가 연결되지 않았습니다"); 
+        {
+            Debug.Log("BulletManager가 연결되지 않았습니다");
             return;
         }
 
         GameObject go = bulletManager.GetBulletPrefab();
         if (go == null)
-        {
-            Debug.Log("No Pool");
             return;
-        }
 
         go.transform.position = gunMuzzle.position;
         go.transform.rotation = Quaternion.LookRotation(dir);

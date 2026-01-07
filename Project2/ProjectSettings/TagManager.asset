@@ -16,11 +16,16 @@ TagManager:
   - Wood (Static)
   - Dirt (Static)
   - Wood
+  - EnemyBody
+  - EnemyHead
+  - YellowTarget
+  - RedTarget
+  - WhiteTarget
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - ground
   - Water
   - UI
   - 
